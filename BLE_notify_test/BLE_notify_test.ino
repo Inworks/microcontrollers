@@ -121,7 +121,7 @@ void loop() {
         Serial.println(Result.c_str()); */ // use this for temp sensor
         
         //pCharacteristic->setValue((uint8_t*)&value, 4);
-        //pCharacteristic->setValue(soilSensor.c_str());
+        pCharacteristic->setValue(test.c_str());
         pCharacteristic->notify();
         delay(500); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
     }
