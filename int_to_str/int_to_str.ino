@@ -1,6 +1,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <list>
 
 using namespace std;
 
@@ -11,6 +12,13 @@ void setup() {
 
 void loop() {
   
+  std::list<string> myList(3, "yes", "no", "maybe");
+
+  for(i = 0; i<myList.size(); i++) {
+    
+  
+  }
+  /* commenting out while testing
   //string text = std::to_string(Number);
   int Number = 123;       // number to be converted to a string
   string test;
@@ -22,7 +30,7 @@ void loop() {
 
   Result = convert.str(); // set 'Result' to the contents of the stream
 
-  Serial.print(Result.c_str());
+  Serial.print(Result.c_str()); */
   delay(1000);
 }
 
