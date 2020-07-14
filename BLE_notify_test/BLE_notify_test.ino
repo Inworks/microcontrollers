@@ -23,6 +23,11 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <sstream>
+#include <string>
+#include <iostream>
+
+using namespace std;
 
 BLEServer* pServer = NULL;
 BLECharacteristic* pCharacteristic = NULL;
@@ -38,6 +43,11 @@ uint32_t value = 0;
 #define SOIL_UUID     "4e882b40-c534-11ea-87d0-0242ac130003"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
+#define SOILPIN 36 // trying pot as analog input
+
+#define SOILPOWER 13 // using digital pin to power the sensor, instead of having it on all the time
+
+int soilVal = 0; 
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -55,6 +65,9 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Starting up BLE");
 
+  pinMode(SOILPOWER, OUTPUT);
+  digitalWrite(SOILPOWER, LOW); // setting power pin off
+  
   // Create the BLE Device
   BLEDevice::init("Konbit.farm - Site 32");
 
@@ -91,10 +104,21 @@ void setup() {
 void loop() {
     // notify changed value
     if (deviceConnected) {
+
+        int soilTest = readSoil();
+        Serial.print(soilTest);
+        string Result;
+
+        ostringstream convert;
+
+        convert << soilTest;
+
+        Result = convert.str();
+        Serial.println(Result.c_str());
         //pCharacteristic->setValue((uint8_t*)&value, 4);
-        pCharacteristic->setValue("Hello to tha wurld");
+        pCharacteristic->setValue(Result.c_str());
         pCharacteristic->notify();
-        delay(2000); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
+        delay(500); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
     }
     // disconnecting
     if (!deviceConnected && oldDeviceConnected) {
@@ -108,4 +132,13 @@ void loop() {
         // do stuff here on connecting
         oldDeviceConnected = deviceConnected;
     }
+}
+
+int readSoil() {
+  digitalWrite(SOILPOWER, HIGH); // turns soil sensor on
+  delay(1000);
+  soilVal = analogRead(SOILPIN);
+  delay(1000);
+  digitalWrite(SOILPOWER, LOW);
+  return soilVal;
 }
