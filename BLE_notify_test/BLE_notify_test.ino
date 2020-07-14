@@ -104,8 +104,12 @@ void setup() {
 void loop() {
     // notify changed value
     if (deviceConnected) {
-
-        int soilTest = readSoil();
+        string test = ""; //should clear out previous assignment
+        int soilNum = readSoil();
+        Serial.println(soilNum);
+        test = soilStatus(soilNum);
+        Serial.println(test.c_str());
+       /* int soilTest = readSoil();
         Serial.print(soilTest);
         string Result;
 
@@ -114,9 +118,10 @@ void loop() {
         convert << soilTest;
 
         Result = convert.str();
-        Serial.println(Result.c_str());
+        Serial.println(Result.c_str()); */ // use this for temp sensor
+        
         //pCharacteristic->setValue((uint8_t*)&value, 4);
-        pCharacteristic->setValue(Result.c_str());
+        pCharacteristic->setValue(test.c_str());
         pCharacteristic->notify();
         delay(500); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
     }
@@ -138,7 +143,36 @@ int readSoil() {
   digitalWrite(SOILPOWER, HIGH); // turns soil sensor on
   delay(1000);
   soilVal = analogRead(SOILPIN);
+  //string soilReading;
   delay(1000);
   digitalWrite(SOILPOWER, LOW);
   return soilVal;
+}
+
+string soilStatus(int N) {
+  string status1 = "Please insert sensor into soil.";
+  string status2 = "Soil Status: Very Dry";
+  string status3 = "Soil Status: Moderately Dry";
+  string status4 = "Soil Status: Moist";
+  string status5 = "Soil Status: Wet";
+  string status6 = "Sensor error. Check wiring.";
+
+    if (N == 0) {
+      return status1;
+    }
+    else if(N >= 1 && N <= 1250) {
+      return status2;
+    }
+    else if(N > 1250 && N <= 2200) {
+      return status3;
+    }
+    else if(N > 2200 && N <= 2900) {
+      return status4;
+    }
+    else if(N > 2900) {
+      return status5;
+    }
+    else {
+      return status6;
+    }
 }
